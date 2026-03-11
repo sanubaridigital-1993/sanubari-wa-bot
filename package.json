@@ -1,0 +1,10 @@
+{
+  "name": "sanubari-wa-bot",
+  "version": "1.0.0",
+  "main": "app.js",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.5",
+    "express": "^4.18.2",
+    "pino": "^8.17.0"
+  }
+}
