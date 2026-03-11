@@ -1,32 +1,32 @@
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require("@whiskeysockets/baileys")
+const { default: makeWASocket, useMultiFileAuthState } = require("@whiskeysockets/baileys")
+const qrcode = require("qrcode-terminal")
 const pino = require("pino")
 
 async function startWhatsApp(){
 
-    const { state, saveCreds } = await useMultiFileAuthState("./session")
+const { state, saveCreds } = await useMultiFileAuthState("./session")
 
-    const sock = makeWASocket({
-        logger: pino({ level: "silent" }),
-        auth: state
-    })
+const sock = makeWASocket({
+logger: pino({ level: "silent" }),
+auth: state
+})
 
-    sock.ev.on("creds.update", saveCreds)
+sock.ev.on("creds.update", saveCreds)
 
-    sock.ev.on("connection.update", (update)=>{
+sock.ev.on("connection.update", ({ connection, qr }) => {
 
-        const { connection, qr } = update
+if(qr){
+qrcode.generate(qr, { small: true })
+}
 
-        if(qr){
-            console.log("QR:", qr)
-        }
+if(connection === "open"){
+console.log("WHATSAPP CONNECTED")
+}
 
-        if(connection === "open"){
-            console.log("WHATSAPP CONNECTED")
-        }
+})
 
-    })
+return sock
 
-    return sock
 }
 
 module.exports = startWhatsApp
