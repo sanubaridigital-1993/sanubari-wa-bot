@@ -1,45 +1,40 @@
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require("@whiskeysockets/baileys")
+const { default: makeWASocket, useMultiFileAuthState } = require("@whiskeysockets/baileys")
 const pino = require("pino")
-const qrcode = require("qrcode-terminal")
 
 async function startWhatsApp(){
 
-    const { state, saveCreds } = await useMultiFileAuthState("./session")
+const { state, saveCreds } = await useMultiFileAuthState("./session")
 
-    const sock = makeWASocket({
-        logger: pino({ level: "silent" }),
-        auth: state,
-        browser: ["Sanubari Bot","Chrome","1.0"]
-    })
+const sock = makeWASocket({
+logger: pino({ level: "silent" }),
+auth: state,
+browser: ["SanubariBot","Chrome","1.0"]
+})
 
-    sock.ev.on("creds.update", saveCreds)
+sock.ev.on("creds.update", saveCreds)
 
-    sock.ev.on("connection.update", ({ connection, qr, lastDisconnect }) => {
+sock.ev.on("connection.update", async ({ connection }) => {
 
-        if(qr){
-            console.log("SCAN QR DI BAWAH INI")
-            qrcode.generate(qr, { small: true })
-        }
+if(connection === "open"){
+console.log("WHATSAPP CONNECTED")
+}
 
-        if(connection === "open"){
-            console.log("WHATSAPP CONNECTED")
-        }
+})
 
-        if(connection === "close"){
-            console.log("WHATSAPP DISCONNECTED")
+/* ===== PAIRING CODE ===== */
 
-            const shouldReconnect =
-                lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut
+if(!sock.authState.creds.registered){
 
-            if(shouldReconnect){
-                console.log("RECONNECTING...")
-                startWhatsApp()
-            }
-        }
+const phoneNumber = "628xxxxxxxxxx" // ganti nomor WA anda
 
-    })
+const code = await sock.requestPairingCode(phoneNumber)
 
-    return sock
+console.log("PAIRING CODE ANDA:")
+console.log(code)
+
+}
+
+return sock
 }
 
 module.exports = startWhatsApp
