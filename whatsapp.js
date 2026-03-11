@@ -1,31 +1,42 @@
-const { default: makeWASocket, useMultiFileAuthState } = require("@whiskeysockets/baileys")
+const { default: makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion } = require("@whiskeysockets/baileys")
 const pino = require("pino")
+const qrcode = require("qrcode-terminal")
 
 async function startWhatsApp(){
 
-    const { state, saveCreds } = await useMultiFileAuthState("./session")
+const { state, saveCreds } = await useMultiFileAuthState("./session")
 
-    const sock = makeWASocket({
-        logger: pino({ level: "silent" }),
-        auth: state,
-        browser: ["SanubariBot","Chrome","1.0"]
-    })
+const { version } = await fetchLatestBaileysVersion()
 
-    sock.ev.on("creds.update", saveCreds)
+const sock = makeWASocket({
+version,
+logger: pino({ level: "silent" }),
+auth: state,
+browser: ["Ubuntu","Chrome","20.0.04"],
+connectTimeoutMs: 60000,
+keepAliveIntervalMs: 10000
+})
 
-    sock.ev.on("connection.update", ({ connection, lastDisconnect }) => {
+sock.ev.on("creds.update", saveCreds)
 
-        if(connection === "open"){
-            console.log("WHATSAPP CONNECTED")
-        }
+sock.ev.on("connection.update", ({ connection, qr }) => {
 
-        if(connection === "close"){
-            console.log("CONNECTION CLOSED")
-        }
+if(qr){
+console.log("SCAN QR DI BAWAH")
+qrcode.generate(qr,{small:true})
+}
 
-    })
+if(connection === "open"){
+console.log("WHATSAPP CONNECTED")
+}
 
-    return sock
+if(connection === "close"){
+console.log("CONNECTION CLOSED")
+}
+
+})
+
+return sock
 }
 
 module.exports = startWhatsApp
