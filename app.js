@@ -6,8 +6,11 @@ app.use(express.json())
 
 let sock = null
 
+console.log("Starting SANUBARI BOT...")
+
 startWhatsApp().then(s => {
     sock = s
+    console.log("WhatsApp module loaded")
 })
 
 app.get("/", (req,res)=>{
@@ -38,4 +41,8 @@ app.post("/send", async (req,res)=>{
 
 })
 
-app.listen(process.env.PORT || 3000)
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, ()=>{
+    console.log("SERVER RUNNING ON PORT "+PORT)
+})
