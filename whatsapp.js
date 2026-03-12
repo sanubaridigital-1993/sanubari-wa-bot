@@ -36,7 +36,7 @@ if(!sock.authState.creds.registered){
 
 try{
 
-const phoneNumber = "628XXXXXXXXXX" // ganti nomor anda
+const phoneNumber = "6282286000225" // ganti nomor anda
 
 const code = await sock.requestPairingCode(phoneNumber)
 
@@ -59,3 +59,4 @@ return sock
 }
 
 module.exports = startWhatsApp
+
