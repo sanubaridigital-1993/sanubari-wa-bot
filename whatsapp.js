@@ -11,31 +11,49 @@ const sock = makeWASocket({
 version,
 logger: pino({ level: "silent" }),
 auth: state,
-browser: ["SanubariBot","Chrome","1.0"]
+browser: ["Ubuntu","Chrome","20.0"]
 })
 
 sock.ev.on("creds.update", saveCreds)
 
-sock.ev.on("connection.update", ({ connection }) => {
+sock.ev.on("connection.update", async ({ connection }) => {
 
 if(connection === "open"){
 console.log("WHATSAPP CONNECTED")
 }
 
+if(connection === "close"){
+console.log("WHATSAPP DISCONNECTED")
+}
+
 })
 
-/* ===== LOGIN DENGAN NOMOR ===== */
+/* request pairing setelah socket siap */
+
+setTimeout(async ()=>{
 
 if(!sock.authState.creds.registered){
 
-const phoneNumber = "628xxxxxxxxxx" // ganti dengan nomor WA Anda
+try{
+
+const phoneNumber = "628XXXXXXXXXX" // ganti nomor anda
 
 const code = await sock.requestPairingCode(phoneNumber)
 
+console.log("")
 console.log("PAIRING CODE ANDA:")
 console.log(code)
+console.log("")
+
+}catch(err){
+
+console.log("PAIRING ERROR:",err.message)
 
 }
+
+}
+
+},5000)
 
 return sock
 }
